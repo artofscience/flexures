@@ -1,0 +1,86 @@
+Written by Stijn Koppen
+Feel free to send any comments/questions/additions to s.koppen@tudelft.nl
+
+
+This tutorial assumes you desire to optimize an object 
+for which you have to analyse the full domain 
+AND symmetry of the resulting topology is not expected 
+(due to asymmetric loading scenarios)
+
+
+1. Open COMSOL Multiphysics
+2. Choose Model Wizard
+3. Select Space Dimension -> (2D or 3D)
+
+From here on we denote the dimension by DIM.
+
+4. Select Physics -> Solid Mechanics (solid) -> Add -> Study
+5. Select Study -> Optimization -> Topology Optimization, Stationary -> Done
+
+Now you have generated an empty DIM model.
+
+6. Build your geometry.
+
+E.g. right-click on Geometry 1 -> Square (Build All Objects to visualize your Geometry)
+
+7. Generate your Material. Right-click on Materials -> Blank Material
+
+Material 1 (mat1):
+Set e.g. E = 1 [Pa], nu = 0.3, rho = 1 kg/m3, or use 
+
+Alternatively, you can use a "real" material.
+
+8. Go to Component 1 -> Materials -> Topology Link 1
+Set Material: your material, and Density Model1 (dtopo1)
+
+9. Define your loadcases.
+
+Add one Solid Mechanics module per loadcase. (Right-click Solid Mechanics (solid) 
+-> Copy, Right-click Component 1 (comp1) -> Paste Solid Mechanics for a new module)
+E.g. if you want you domain to be stiff in tension, 
+but compliant in shear, you will have 2 loadcases and thus 2 Solid Mechanics modules.
+
+for (loadcase) {
+
+Set Fixed Constraint.
+Set Prescribed Displacement (make sure to check all the boxes u0x, u0y etc. 
+and set displacements as desired).
+The combination of the latter should represent 
+the "deformation pattern" or "mode" of this loadcase, 
+e.g. the desired/undesired movement of the object.
+
+}
+
+10. Go to Study 1 -> Topology Optimization
+
+Setting up to objective function:
+Your objective function consists of ALL strain energies 
+of prescribed deformation patterns you require to be STIFF
+Set e.g. 
+comp1.solid.Ws_tot
+Comp1.solid2.Ws_tot
+
+Type: Maximization
+Solution ("Auto" if single, "Sum of objectives" if multiple)
+
+Add constraints:
+Your constraint function consist of ALL strain energies 
+of prescribed deformation patterns you required to be COMPLIANT
+Set e.g.
+comp1.solid3.Ws_tot (upper bound 10)
+comp1.solid4.Ws_tot (upper bound 20)
+The upper bound obviously are derived from your application 
+(that is the maximum stored energy/stiffness for this prescribed displacement)
+
+11. Output while solving -> Plot -> 
+Output material volume fraction (requires at least 1 run)
+
+12. Post proc (see COMSOL tutorials)
+
+Enjoy your output!
+
+One love,
+
+Stijn
+
+
